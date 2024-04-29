@@ -21,34 +21,21 @@ public class TokenService {
     @Autowired
     UserRepository userRepository;
 
-    public Token createToken(String username){
-        Token refreshToken = Token.builder()
-                .user(userRepository.findByLogin(username))
-                .token(UUID.randomUUID().toString())
+    public void saveToken(String login, String generatedToken){
+        User user = userRepository.findByLogin(login);
+        Token token = Token.builder()
+                .user(user)
+                .token(generatedToken)
                 .expiryDate(new Date((new Date()).getTime() + 24*60*60*1000).toInstant())
                 .build();
-        return tokenRepository.save(refreshToken);
+        revokeToken(user.getId());
+        tokenRepository.save(token);
     }
 
-    public void removeToken(Long id) {
+    public void revokeToken(Long id) {
         User user = userRepository.findUserById(id);
         Token token = tokenRepository.findByUser(user).orElseThrow();
-        removeTokenFromDb(token);
-    }
-
-    public Optional<Token> findByToken(String token){
-        return tokenRepository.findByToken(token);
-    }
-
-    public Token verifyExpiration(Token token){
-        if(token.getExpiryDate().compareTo(Instant.now())<0){
-            removeTokenFromDb(token);
-            throw new RuntimeException(token.getToken() + " Refresh token is expired. Please make a new login..!");
-        }
-        return token;
-    }
-
-    private void removeTokenFromDb(Token token) {
         tokenRepository.delete(token);
     }
+
 }

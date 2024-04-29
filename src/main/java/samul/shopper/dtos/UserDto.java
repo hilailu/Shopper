@@ -13,7 +13,7 @@ import samul.shopper.entities.Role;
 @AllArgsConstructor
 public class UserDto {
 
-    private long id;
+    private Long id;
     private String login;
     private String password;
     private String email;

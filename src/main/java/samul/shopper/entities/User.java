@@ -17,7 +17,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "userid")
-    private long id;
+    private Long id;
 
     @Column(unique = true)
     private String login;
