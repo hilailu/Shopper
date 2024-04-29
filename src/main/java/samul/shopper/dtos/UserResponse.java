@@ -1,2 +1,17 @@
-package samul.shopper.dtos;public class UserResponse {
+package samul.shopper.dtos;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import samul.shopper.entities.Role;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
+public class UserResponse {
+    private Long id;
+    private String username;
+    private Role role;
 }
