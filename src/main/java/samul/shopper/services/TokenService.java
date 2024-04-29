@@ -34,8 +34,12 @@ public class TokenService {
 
     public void revokeToken(Long id) {
         User user = userRepository.findUserById(id);
-        Token token = tokenRepository.findByUser(user).orElseThrow();
-        tokenRepository.delete(token);
+        Optional<Token> token = tokenRepository.findByUser(user);
+        token.ifPresent(value -> tokenRepository.delete(value));
     }
 
+    public void revokeToken(String token) {
+        Optional<Token> tokenDb = tokenRepository.findByToken(token);
+        tokenDb.ifPresent(value -> tokenRepository.delete(value));
+    }
 }
