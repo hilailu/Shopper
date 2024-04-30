@@ -3,25 +3,25 @@ package samul.shopper.controllers;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import samul.shopper.dtos.AuthRequestDto;
 import samul.shopper.dtos.JwtResponseDto;
-import samul.shopper.dtos.LogoutRequestDto;
 import samul.shopper.dtos.UserDto;
 import samul.shopper.exceptions.ResourceNotFoundException;
 import samul.shopper.services.JwtService;
 import samul.shopper.services.TokenService;
 import samul.shopper.services.UserService;
 
+@CrossOrigin("*")
+@AllArgsConstructor
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -41,19 +41,21 @@ public class AuthController {
     private final int cookieExpiry = 24*60*60*1000;
 
     @PostMapping("/register")
-    public JwtResponseDto registerAndGetToken(@RequestBody UserDto userDto, HttpServletResponse response){
+    public ResponseEntity<JwtResponseDto> registerAndGetToken(@RequestBody UserDto userDto, HttpServletResponse response){
         String password = userDto.getPassword();
         userService.createUser(userDto);
-        return authenticate(userDto.getLogin(), password, response);
+        JwtResponseDto jwtResponseDto = authenticate(userDto.getLogin(), password, response);
+        return ResponseEntity.ok(jwtResponseDto);
     }
 
     @PostMapping("/login")
-    public JwtResponseDto authenticateAndGetToken(@RequestBody AuthRequestDto authRequestDto, HttpServletResponse response){
-        return authenticate(authRequestDto.getLogin(), authRequestDto.getPassword(), response);
+    public ResponseEntity<JwtResponseDto> authenticateAndGetToken(@RequestBody AuthRequestDto authRequestDto, HttpServletResponse response){
+        JwtResponseDto jwtResponseDto = authenticate(authRequestDto.getLogin(), authRequestDto.getPassword(), response);
+        return ResponseEntity.ok(jwtResponseDto);
     }
 
     @PostMapping("/logout")
-    public String logout(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
@@ -62,11 +64,11 @@ public class AuthController {
                     cookie.setMaxAge(0);
                     cookie.setPath("/");
                     response.addCookie(cookie);
-                    return "success";
+                    return ResponseEntity.ok("Logout successful");
                 }
             }
         }
-        return "No token found";
+        return ResponseEntity.ok("Token not found");
     }
 
     private JwtResponseDto authenticate(String login, String password, HttpServletResponse response) {
