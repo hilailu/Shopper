@@ -5,6 +5,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +21,18 @@ import java.util.function.Function;
 public class JwtService {
     private final String SECRET_KEY = "d57017bc3c79eb3aa43b957def83a9b2d689823d781f4e850918bc7a0c3720f5";
     private final int EXPIRATION_TIME = 24*60*60*1000;
+
+    public String getAccessTokenFromCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("accessToken")) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
 
     public String extractLogin(String token) {
         return extractClaim(token, Claims::getSubject);

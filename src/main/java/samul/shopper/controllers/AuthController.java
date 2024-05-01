@@ -40,6 +40,15 @@ public class AuthController {
 
     private final int cookieExpiry = 24*60*60*1000;
 
+    @GetMapping("/")
+    public String redirect(HttpServletRequest request) {
+        if (jwtService.getAccessTokenFromCookie(request) != null) {
+            return "/profile";
+        } else {
+            return "/auth/login";
+        }
+    }
+
     @PostMapping("/register")
     public ResponseEntity<JwtResponseDto> registerAndGetToken(@RequestBody UserDto userDto, HttpServletResponse response){
         String password = userDto.getPassword();
