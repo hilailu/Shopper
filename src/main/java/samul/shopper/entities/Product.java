@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,7 +20,7 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "productid")
-    private long id;
+    private Long id;
 
     @Column(name = "productname")
     private String productName;
@@ -28,4 +31,12 @@ public class Product {
     private Double price;
 
     private Integer quantity;
+
+    @ManyToMany
+    @JoinTable(
+            name = "category_product",
+            joinColumns = @JoinColumn(name = "productid"),
+            inverseJoinColumns = @JoinColumn(name = "categoryid")
+    )
+    private Set<Category> categories = new HashSet<>();
 }

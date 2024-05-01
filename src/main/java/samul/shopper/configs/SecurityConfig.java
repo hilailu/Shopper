@@ -46,11 +46,9 @@ public class SecurityConfig {
                     corsConfiguration.setAllowCredentials(true);
                     return corsConfiguration;}))
                 .authorizeHttpRequests(r -> r
-                        .requestMatchers("/auth/*", "/error")
-                        .permitAll()
-                        .requestMatchers("/admin").hasAuthority("ADMIN")
-                        .anyRequest()
-                        .authenticated())
+                        .requestMatchers("/auth/*", "/error", "/catalog*").permitAll()
+                        .requestMatchers("/admin/*").hasAuthority("ADMIN")
+                        .anyRequest().authenticated())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class).build();

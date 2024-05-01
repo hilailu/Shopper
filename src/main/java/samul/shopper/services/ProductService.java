@@ -10,4 +10,5 @@ public interface ProductService {
     List<ProductDto> getAllProducts();
     ProductDto updateProduct(Long id, ProductDto updatedProduct);
     void deleteProduct(Long id);
+    List<ProductDto> getAllProducts(Double minPrice, Double maxPrice, String category, String name, String sortBy, String sortDir);
 }

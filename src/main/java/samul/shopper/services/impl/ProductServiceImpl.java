@@ -9,6 +9,7 @@ import samul.shopper.mappers.ProductMapper;
 import samul.shopper.repositories.ProductRepository;
 import samul.shopper.services.ProductService;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,6 +43,47 @@ public class ProductServiceImpl implements ProductService {
         return products.stream().map((product) -> ProductMapper.mapToProductDto(product))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<ProductDto> getAllProducts(Double minPrice, Double maxPrice, String category, String name, String sortBy, String sortDir) {
+        List<Product> products = productRepository.findAll();
+
+        if (minPrice != null) {
+            products = products.stream().filter(product -> product.getPrice().compareTo(minPrice) >= 0).collect(Collectors.toList());
+        }
+
+        if (maxPrice != null) {
+            products = products.stream().filter(product -> product.getPrice().compareTo(maxPrice) <= 0).collect(Collectors.toList());
+        }
+
+        if (category != null && !category.isEmpty()) {
+            products = products.stream()
+                    .filter(product -> product.getCategories().stream()
+                            .anyMatch(cat -> cat.getCategoryName().equalsIgnoreCase(category)))
+                    .collect(Collectors.toList());
+        }
+
+        if (name != null && !name.isEmpty()) {
+            products = products.stream()
+                    .filter(product -> product.getProductName().toLowerCase().contains(name.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+
+        Comparator<Product> comparator = Comparator.comparing(Product::getProductName);
+        if (sortBy.equalsIgnoreCase("price")) {
+            comparator = Comparator.comparing(Product::getPrice);
+        } else if (sortBy.equalsIgnoreCase("name")) {
+            comparator = Comparator.comparing(Product::getProductName);
+        }
+        if (sortDir.equalsIgnoreCase("desc")) {
+            comparator = comparator.reversed();
+        }
+        products.sort(comparator);
+
+        return products.stream().map((product) -> ProductMapper.mapToProductDto(product))
+                .collect(Collectors.toList());
+    }
+
 
     @Override
     public ProductDto updateProduct(Long id, ProductDto updatedProduct) {
