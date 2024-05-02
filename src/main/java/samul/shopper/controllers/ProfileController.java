@@ -1,15 +1,14 @@
 package samul.shopper.controllers;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import samul.shopper.dtos.CustomerDto;
 import samul.shopper.entities.Customer;
 import samul.shopper.mappers.CustomerMapper;
 import samul.shopper.repositories.UserRepository;
 import samul.shopper.services.CustomerService;
-import samul.shopper.services.JwtService;
 
 @CrossOrigin("*")
 @RestController
@@ -18,13 +17,11 @@ import samul.shopper.services.JwtService;
 public class ProfileController {
 
     private UserRepository userRepository;
-    private JwtService jwtService;
     private CustomerService customerService;
 
     @GetMapping
-    public ResponseEntity<CustomerDto> getCustomer(HttpServletRequest request) {
-        String token = jwtService.getAccessTokenFromCookie(request);
-        String login = jwtService.extractLogin(token);
+    public ResponseEntity<CustomerDto> getCustomer() {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Customer customer = customerService.findByUserLogin(login);
 
         if (customer == null) {

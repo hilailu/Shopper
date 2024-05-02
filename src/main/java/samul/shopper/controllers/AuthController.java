@@ -1,5 +1,6 @@
 package samul.shopper.controllers;
 
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,6 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 import samul.shopper.dtos.AuthRequestDto;
 import samul.shopper.dtos.JwtResponseDto;
@@ -19,6 +24,8 @@ import samul.shopper.exceptions.ResourceNotFoundException;
 import samul.shopper.services.JwtService;
 import samul.shopper.services.TokenService;
 import samul.shopper.services.UserService;
+
+import java.util.Objects;
 
 @CrossOrigin("*")
 @AllArgsConstructor
@@ -41,8 +48,8 @@ public class AuthController {
     private final int cookieExpiry = 24*60*60*1000;
 
     @GetMapping("/")
-    public String redirect(HttpServletRequest request) {
-        if (jwtService.getAccessTokenFromCookie(request) != null) {
+    public String redirect() {
+        if (!Objects.equals(SecurityContextHolder.getContext().getAuthentication().getName(), "anonymousUser")) {
             return "/profile";
         } else {
             return "/auth/login";
@@ -64,19 +71,11 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("accessToken")) {
-                    tokenService.revokeToken(cookie.getValue());
-                    cookie.setMaxAge(0);
-                    cookie.setPath("/");
-                    response.addCookie(cookie);
-                    return ResponseEntity.ok("Logout successful");
-                }
-            }
-        }
+    public ResponseEntity<String> logout(Authentication authentication, HttpServletRequest request, HttpServletResponse response) throws ServletException {
+        SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
+        CookieClearingLogoutHandler cook = new CookieClearingLogoutHandler("accessToken");
+        cook.logout(request, response, authentication);
+        logoutHandler.logout(request, response, authentication);
         return ResponseEntity.ok("Token not found");
     }
 

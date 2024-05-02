@@ -46,7 +46,7 @@ public class SecurityConfig {
                     corsConfiguration.setAllowCredentials(true);
                     return corsConfiguration;}))
                 .authorizeHttpRequests(r -> r
-                        .requestMatchers("/auth/*", "/error", "/catalog*").permitAll()
+                        .requestMatchers("/auth/*", "/error", "/catalog*", "/cart").permitAll()
                         .requestMatchers("/admin/*").hasAuthority("ADMIN")
                         .anyRequest().authenticated())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
