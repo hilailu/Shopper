@@ -49,8 +49,10 @@ public class AuthController {
 
     @GetMapping("/")
     public String redirect() {
-        if (!Objects.equals(SecurityContextHolder.getContext().getAuthentication().getName(), "anonymousUser")) {
-            return "/profile";
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (!Objects.equals(auth.getName(), "anonymousUser")) {
+            boolean admin = auth.getAuthorities().stream().anyMatch(ga -> ga.getAuthority().equals("ADMIN"));
+            return admin ? "/admin/" : "/profile";
         } else {
             return "/auth/login";
         }

@@ -5,6 +5,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import samul.shopper.dtos.OrderProductRequest;
 import samul.shopper.dtos.OrderRequestDto;
+import samul.shopper.dtos.OrderStatusDto;
 import samul.shopper.dtos.ProductDto;
 import samul.shopper.entities.Customer;
 import samul.shopper.entities.Order;
@@ -68,6 +69,18 @@ public class OrderServiceImpl implements OrderService {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Customer customer = customerService.findByUserLogin(login);
         return orderRepository.findByCustomer(customer);
+    }
+
+    @Override
+    public List<Order> getAllOrders() {
+        return orderRepository.findAll();
+    }
+
+    @Override
+    public void updateOrderStatus(OrderStatusDto orderStatusDto) {
+        Order order = orderRepository.findById(orderStatusDto.getId()).orElseThrow();
+        order.setOrderStatus(orderStatusDto.getStatus());
+        orderRepository.save(order);
     }
 
     private double calculateTotalPrice(List<OrderProductRequest> orderProducts) {
