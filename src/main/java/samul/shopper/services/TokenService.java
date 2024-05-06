@@ -37,9 +37,4 @@ public class TokenService {
         Optional<Token> token = tokenRepository.findByUser(user);
         token.ifPresent(value -> tokenRepository.delete(value));
     }
-
-    public void revokeToken(String token) {
-        Optional<Token> tokenDb = tokenRepository.findByToken(token);
-        tokenDb.ifPresent(value -> tokenRepository.delete(value));
-    }
 }
