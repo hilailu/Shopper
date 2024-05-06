@@ -8,8 +8,8 @@ public class VendorMapper {
         return new VendorDto(
                 vendor.getId(),
                 vendor.getVendorName(),
-                vendor.getPhoneNumber(),
                 vendor.getEmail(),
+                vendor.getPhoneNumber(),
                 vendor.getCountry()
         );
     }
@@ -18,8 +18,8 @@ public class VendorMapper {
         return new Vendor(
                 vendorDto.getId(),
                 vendorDto.getVendorName(),
-                vendorDto.getPhoneNumber(),
                 vendorDto.getEmail(),
+                vendorDto.getPhoneNumber(),
                 vendorDto.getCountry()
         );
     }

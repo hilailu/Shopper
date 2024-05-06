@@ -13,6 +13,6 @@ public class VendorDto {
     private long id;
     private String vendorName;
     private String email;
-    private String country;
     private String phoneNumber;
+    private String country;
 }

@@ -22,10 +22,10 @@ public class Vendor {
     @Column(name = "vendorname")
     private String vendorName;
 
+    private String email;
+
     @Column(name = "phonenumber")
     private String phoneNumber;
-
-    private String email;
 
     private String country;
 }
